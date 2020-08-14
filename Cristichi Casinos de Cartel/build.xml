@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="CasinosDeCartel" default="makejar" basedir=".">
+    <target name="makejar" description="Compila todo en un .jar">
+        <jar destfile="C:/Todo/MC Servers/Pruebas 1.16/plugins/${ant.project.name}.jar">
+            <fileset dir="bin"></fileset>
+            <fileset file="plugin.yml"></fileset>
+        </jar>
+    </target>
+</project>

@@ -1,5 +1,6 @@
 package obj;
 
+import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
@@ -7,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
 
 import main.CristichiCasinosCartel;
+import ruleta.ItemRuleta;
 import ruleta.Ruleta;
 
 public class CasinoDeCartel {
@@ -42,7 +44,7 @@ public class CasinoDeCartel {
 								cdc.setPrecio(d);
 								cdc.ruleta = new Ruleta();
 								cdc.cartel = s;
-								e.setLine(2, "");
+								e.setLine(2, "¡Prueba Suerte!");
 								e.setLine(3, "Esperando...");
 							} catch (NumberFormatException ex) {
 								e.setLine(0, CasinoDeCartel.HEADER_CARTEL_ERROR);
@@ -95,10 +97,19 @@ public class CasinoDeCartel {
 	}
 
 	public void girar(Player p) {
-		String[] items = ruleta.girar();
-		cartel.setLine(0, items[0]);
-		cartel.setLine(1, items[1]);
-		cartel.setLine(2, items[2]);
+		ItemRuleta[][] items = ruleta.girar();
+		cartel.setLine(0, "- [" + items[0][0] + "][" + items[0][1] + "][" + items[0][2] + "] -");
+		cartel.setLine(1, "- [" + items[1][0] + "][" + items[1][1] + "][" + items[1][2] + "] -");
+		cartel.setLine(2, "- [" + items[2][0] + "][" + items[2][1] + "][" + items[2][2] + "] -");
+		cartel.setLine(3, p.getDisplayName());
+		cartel.update();
+	}
+	
+	public void ultimo(Player p) {
+		ItemRuleta[][] items = ruleta.actual();
+		cartel.setLine(0, ChatColor.GOLD+"-"+ChatColor.RESET+" [" + items[0][0] + "][" + items[0][1] + "][" + items[0][2] + "] "+ChatColor.GOLD+"-");
+		cartel.setLine(1, ChatColor.GOLD+"-"+ChatColor.RESET+" [" + items[1][0] + "][" + items[1][1] + "][" + items[1][2] + "] "+ChatColor.GOLD+"-");
+		cartel.setLine(2, ChatColor.GOLD+"-"+ChatColor.RESET+" [" + items[2][0] + "][" + items[2][1] + "][" + items[2][2] + "] "+ChatColor.GOLD+"-");
 		cartel.setLine(3, p.getDisplayName());
 		cartel.update();
 	}
@@ -106,7 +117,7 @@ public class CasinoDeCartel {
 	public void terminarGiro(Player p) {
 		cartel.setLine(0, HEADER_CARTEL_VISIBLE);
 		cartel.setLine(1, Double.toString(precio));
-		cartel.setLine(2, "");
+		cartel.setLine(2, "¡Prueba Suerte!");
 		cartel.setLine(3, "Esperando...");
 		cartel.update();
 	}

@@ -12,24 +12,25 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import net.milkbowl.vault.economy.Economy;
 import obj.CasinoDeCartel;
+import ruleta.ItemRuleta;
+import ruleta.Puntuacion;
 
 public class CristichiCasinosCartel extends JavaPlugin implements Listener {
 	private static final Logger log = Logger.getLogger("Minecraft");
 	public static Economy econ = null;
 
-	private PluginDescriptionFile desc = getDescription();
+//	private PluginDescriptionFile desc = getDescription();
 
-	public static final ChatColor mainColor = ChatColor.BLUE;
-	public static final ChatColor textColor = ChatColor.AQUA;
-	public static final ChatColor accentColor = ChatColor.DARK_AQUA;
+	public static final ChatColor mainColor = ChatColor.DARK_AQUA;
+	public static final ChatColor textColor = ChatColor.GREEN;
+	public static final ChatColor accentColor = ChatColor.GOLD;
 	public static final ChatColor errorColor = ChatColor.RED;
-	public final String header = mainColor + "[" + desc.getName() + "] " + textColor;
+	public final String header = mainColor + "[Casinos de Cartel] " + textColor;
 
 	private boolean setupEconomy() {
 		if (getServer().getPluginManager().getPlugin("Vault") == null) {
@@ -70,24 +71,47 @@ public class CristichiCasinosCartel extends JavaPlugin implements Listener {
 			Block block = e.getClickedBlock();
 			final CasinoDeCartel cdc = CasinoDeCartel.check(block);
 			if (cdc != null) {
+				if (!econ.hasAccount(e.getPlayer())) {
+					econ.createPlayerAccount(e.getPlayer());
+				}
+				if (econ.getBalance(e.getPlayer()) < cdc.getPrecio()) {
+					e.getPlayer()
+							.sendMessage(header + errorColor + "No puedes permitirte esta tirada. Tienes " + accentColor
+									+ econ.getBalance(e.getPlayer()) + textColor + " y necesitas " + accentColor
+									+ cdc.getPrecio() + textColor + ".");
+					return;
+				}
+				econ.withdrawPlayer(e.getPlayer(), cdc.getPrecio());
+				e.getPlayer().sendMessage(header + "Has pagado " + accentColor + cdc.getPrecio() + textColor
+						+ " para hacer la tirada. ¡Mucha suerte!");
 				int i = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 					@Override
 					public void run() {
 						cdc.girar(e.getPlayer());
-//						e.getPlayer().sendMessage(header + cdc.getRuleta().toString());
+//						ItemRuleta[][] items = cdc.getRuleta().actual();
+//						e.getPlayer().sendMessage(new String[] {
+//								"----",
+//								items[0][0] + " " + items[0][1] + " " + items[0][2],
+//								items[1][0] + " " + items[1][1] + " " + items[1][2],
+//								items[2][0] + " " + items[2][1] + " " + items[2][2]
+//						});
 					}
-				}, 0, 5);
+				}, 0, 2);
 				Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-
 					@Override
 					public void run() {
 						Bukkit.getScheduler().cancelTask(i);
-						String[] items = cdc.getRuleta().actual();
-						e.getPlayer().sendMessage(new String[] {
-							header + "Resultado:",
-							items[0], items[1], items[2],
-							header + "Ruleta terminada, NPI de lo que has ganado porque no está terminada"
-						});
+						cdc.ultimo(e.getPlayer());
+						ItemRuleta[][] items = cdc.getRuleta().actual();
+						Puntuacion punt = cdc.getRuleta().getPuntuacion();
+						double ganado = cdc.getPrecio() * punt.getMult();
+						econ.depositPlayer(e.getPlayer(), ganado);
+						e.getPlayer().sendMessage(new String[] { header + "Resultado:",
+								".                           " + items[0][0] + " " + items[0][1] + " " + items[0][2],
+								".                           " + items[1][0] + " " + items[1][1] + " " + items[1][2],
+								".                           " + items[2][0] + " " + items[2][1] + " " + items[2][2],
+//								header + "Ruleta terminada, has ganado " + accentColor + ganado + textColor + ": " + accentColor + punt.getMotivo() });
+								header + "Ruleta terminada, has ganado " + accentColor + ganado + textColor + "." });
 					}
 				}, 60);
 				Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {

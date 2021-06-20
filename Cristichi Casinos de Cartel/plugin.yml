@@ -4,7 +4,7 @@ version: 0.115
 api-version: 1.13
 depend: [Vault]
 commands:
-  casinocartel:
+  criscasinocartel:
     description: Controla el plugin.
-    aliases: [ccc]
-    usage: /ccc help
+    aliases: [cc, ccc]
+    usage: /cc help

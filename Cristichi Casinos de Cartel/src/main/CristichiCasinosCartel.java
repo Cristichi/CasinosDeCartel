@@ -1,5 +1,8 @@
 package main;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
@@ -69,7 +72,7 @@ public class CristichiCasinosCartel extends JavaPlugin implements Listener {
 	private void onSignClicked(PlayerInteractEvent e) {
 		if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			Block block = e.getClickedBlock();
-			final CasinoDeCartel cdc = CasinoDeCartel.check(block);
+			CasinoDeCartel cdc = CasinoDeCartel.check(block);
 			if (cdc != null) {
 				if (!econ.hasAccount(e.getPlayer())) {
 					econ.createPlayerAccount(e.getPlayer());
@@ -77,8 +80,8 @@ public class CristichiCasinosCartel extends JavaPlugin implements Listener {
 				if (econ.getBalance(e.getPlayer()) < cdc.getPrecio()) {
 					e.getPlayer()
 							.sendMessage(header + errorColor + "No puedes permitirte esta tirada. Tienes " + accentColor
-									+ econ.getBalance(e.getPlayer()) + textColor + " y necesitas " + accentColor
-									+ cdc.getPrecio() + textColor + ".");
+									+ econ.getBalance(e.getPlayer()) + errorColor + " y necesitas " + accentColor
+									+ cdc.getPrecio() + errorColor + ".");
 					return;
 				}
 				econ.withdrawPlayer(e.getPlayer(), cdc.getPrecio());
@@ -96,7 +99,7 @@ public class CristichiCasinosCartel extends JavaPlugin implements Listener {
 //								items[2][0] + " " + items[2][1] + " " + items[2][2]
 //						});
 					}
-				}, 0, 2);
+				}, 0, 3);
 				Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 					@Override
 					public void run() {
@@ -107,13 +110,16 @@ public class CristichiCasinosCartel extends JavaPlugin implements Listener {
 						double ganado = cdc.getPrecio() * punt.getMult();
 						econ.depositPlayer(e.getPlayer(), ganado);
 						e.getPlayer().sendMessage(new String[] { header + "Resultado:",
-								".                           " + items[0][0] + " " + items[0][1] + " " + items[0][2],
-								".                           " + items[1][0] + " " + items[1][1] + " " + items[1][2],
-								".                           " + items[2][0] + " " + items[2][1] + " " + items[2][2],
-//								header + "Ruleta terminada, has ganado " + accentColor + ganado + textColor + ": " + accentColor + punt.getMotivo() });
-								header + "Ruleta terminada, has ganado " + accentColor + ganado + textColor + "." });
+							".                           " + items[0][0] + " " + items[0][1] + " " + items[0][2],
+							".                           " + items[1][0] + " " + items[1][1] + " " + items[1][2],
+							".                           " + items[2][0] + " " + items[2][1] + " " + items[2][2],
+							header + "Ruleta terminada, has ganado " + accentColor + ganado + textColor + " por "
+									+ accentColor + punt.getMotivo() + textColor + ".",
+//								header + "Ruleta terminada, has ganado " + accentColor + ganado + textColor + ".",
+							header + "Tu dinero actual: " + econ.getBalance(e.getPlayer()),
+						});
 					}
-				}, 60);
+				}, 70);
 				Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 					@Override
 					public void run() {
@@ -126,6 +132,26 @@ public class CristichiCasinosCartel extends JavaPlugin implements Listener {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		return super.onCommand(sender, command, label, args);
+		if (args.length == 0)
+			return false;
+		switch (args[0]) {
+		case "help":
+			sender.sendMessage(new String[] { header + "Para empezar, coloca un cartel con las siguientes líneas:",
+					accentColor + "  [CC]", accentColor + "(precio)" });
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+		System.out.println("---------------");
+		System.out.println(command.getName());
+		System.out.println(alias + ": " + Arrays.toString(args));
+		List<String> ret = new ArrayList<>(1);
+		if (args.length <= 1) {
+			ret.add("help");
+		}
+		return ret;
 	}
 }

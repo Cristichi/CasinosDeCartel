@@ -1,6 +1,7 @@
 package ruleta;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 public class Rollo extends ArrayList<ItemRuleta> {
@@ -14,6 +15,7 @@ public class Rollo extends ArrayList<ItemRuleta> {
 		for (ItemRuleta itemRuleta : array) {
 			add(itemRuleta);
 		}
+		Collections.shuffle(this);
 		indice = rng.nextInt(array.length);
 		this.rng = rng;
 	}

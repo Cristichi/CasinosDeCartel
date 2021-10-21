@@ -12,7 +12,7 @@ import ruleta.ItemRuleta;
 import ruleta.Ruleta;
 
 public class CasinoDeCartel {
-	public static final String[] HEADER_CARTEL_ESCRITO = new String[] { "[Casino Cartel]", "[CC]" };
+	public static final String[] HEADER_CARTEL_ESCRITO = new String[] { "[Casino Cartel]", "[CC]", "[CDC]" };
 	public static final String HEADER_CARTEL_VISIBLE = CristichiCasinosCartel.mainColor + HEADER_CARTEL_ESCRITO[0];
 	public static final String HEADER_CARTEL_ERROR = CristichiCasinosCartel.errorColor + HEADER_CARTEL_ESCRITO[0];
 
@@ -44,7 +44,7 @@ public class CasinoDeCartel {
 								cdc.setPrecio(d);
 								cdc.ruleta = new Ruleta();
 								cdc.cartel = s;
-								e.setLine(2, "¡Prueba Suerte!");
+								e.setLine(2, "Â¡Prueba Suerte!");
 								e.setLine(3, "Esperando...");
 							} catch (NumberFormatException ex) {
 								e.setLine(0, CasinoDeCartel.HEADER_CARTEL_ERROR);
@@ -117,7 +117,7 @@ public class CasinoDeCartel {
 	public void terminarGiro(Player p) {
 		cartel.setLine(0, HEADER_CARTEL_VISIBLE);
 		cartel.setLine(1, Double.toString(precio));
-		cartel.setLine(2, "¡Prueba Suerte!");
+		cartel.setLine(2, "Â¡Prueba Suerte!");
 		cartel.setLine(3, "Esperando...");
 		cartel.update();
 	}

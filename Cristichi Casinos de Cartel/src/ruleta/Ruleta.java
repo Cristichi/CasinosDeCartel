@@ -14,16 +14,16 @@ public class Ruleta {
 		this.rollo3 = new Rollo(rng);
 	}
 
-	public void reset(int minGiros, int maxGiros) {
-		double x = Math.random() * (maxGiros - minGiros) + minGiros;
-		double y = Math.random() * (maxGiros - minGiros) + minGiros;
-		double z = Math.random() * (maxGiros - minGiros) + minGiros;
+	public void reset(int minGiros1, int maxGiros1, int dif) {
+		double x = Math.random() * (maxGiros1 - minGiros1) + minGiros1;
+		double y = Math.random() * (maxGiros1 - minGiros1) + minGiros1;
+		double z = Math.random() * (maxGiros1 - minGiros1) + minGiros1;
 		double max = Math.max(x, Math.max(y, z));
 		double min = Math.min(x, Math.min(y, z));
 		double mid = x + y + z - max - min;
 		giros1 = (int) min;
-		giros2 = (int) mid;
-		giros3 = (int) max;
+		giros2 = (int) mid + dif;
+		giros3 = (int) max + dif * 2;
 	}
 
 	// TODO: En lugar de avanzar aleatoriamente, avanzan a la par pero con 3
@@ -32,17 +32,26 @@ public class Ruleta {
 		ItemRuleta[] i1 = rollo1.actual();
 		ItemRuleta[] i2 = rollo2.actual();
 		ItemRuleta[] i3 = rollo3.actual();
-		if (giros1-- > 0)
+		if (giros1 > 0) {
 			i1 = rollo1.siguiente();
-		if (giros2-- > 0)
+			giros1--;
+		}
+		if (giros2 > 0) {
 			i2 = rollo2.siguiente();
-		if (giros3-- > 0)
+			giros2--;
+		}
+		if (giros3 > 0) {
 			i3 = rollo3.siguiente();
+			giros3--;
+		}
 		return new ItemRuleta[][] { new ItemRuleta[] { i1[0], i2[0], i3[0] }, new ItemRuleta[] { i1[1], i2[1], i3[1] },
 				new ItemRuleta[] { i1[2], i2[2], i3[2] } };
 	}
 
 	public boolean isFinished() {
+		System.out.println("giros1 = " + giros1);
+		System.out.println("giros2 = " + giros2);
+		System.out.println("giros3 = " + giros3);
 		return giros1 == giros2 && giros2 == giros3 && giros3 == 0;
 	}
 

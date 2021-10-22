@@ -1,7 +1,6 @@
 package main;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -32,7 +31,7 @@ public class CristichiCasinosCartel extends JavaPlugin implements Listener {
 //	private PluginDescriptionFile desc = getDescription();
 
 	public static final ChatColor mainColor = ChatColor.DARK_AQUA;
-	public static final ChatColor textColor = ChatColor.GREEN;
+	public static final ChatColor textColor = ChatColor.WHITE;
 	public static final ChatColor accentColor = ChatColor.GOLD;
 	public static final ChatColor errorColor = ChatColor.RED;
 	public final String header = mainColor + "[Casinos de Cartel] " + textColor;
@@ -92,41 +91,45 @@ public class CristichiCasinosCartel extends JavaPlugin implements Listener {
 				e.getPlayer().sendMessage(header + "Has pagado " + accentColor + cdc.getPrecio() + textColor
 						+ " para hacer la tirada. ¡Mucha suerte!");
 
-				cdc.reset(20, 30);
+				cdc.reset(20, 40, 10);
 				int hiloGirarRueda = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+					boolean finished = false;
+
 					@Override
 					public void run() {
-						if (cdc.isFinished()) {
-							cdc.ultimo(e.getPlayer());
-							ItemRuleta[][] items = cdc.getRuleta().actual();
-							Puntuacion punt = cdc.getRuleta().getPuntuacion();
-							double ganado = cdc.getPrecio() * punt.getMult();
-							econ.depositPlayer(e.getPlayer(), ganado);
-							e.getPlayer()
-									.sendMessage(new String[] { header + "Resultado:",
-											".                           " + items[0][0] + " " + items[0][1] + " "
-													+ items[0][2],
-											".                           " + items[1][0] + " " + items[1][1] + " "
-													+ items[1][2],
-											".                           " + items[2][0] + " " + items[2][1] + " "
-													+ items[2][2],
-											header + "Ruleta terminada, has ganado " + accentColor + ganado + textColor
-													+ " por " + accentColor + punt.getMotivo() + textColor + ".",
+						if (!finished)
+							if (cdc.isFinished()) {
+								cancelTask();
+								cdc.ultimo(e.getPlayer());
+								ItemRuleta[][] items = cdc.getRuleta().actual();
+								Puntuacion punt = cdc.getRuleta().getPuntuacion();
+								double ganado = cdc.getPrecio() * punt.getMult();
+								econ.depositPlayer(e.getPlayer(), ganado);
+								e.getPlayer().sendMessage(new String[] { header + "Resultado:",
+										".                           " + items[0][0] + " " + items[0][1] + " "
+												+ items[0][2],
+										".                           " + items[1][0] + " " + items[1][1] + " "
+												+ items[1][2],
+										".                           " + items[2][0] + " " + items[2][1] + " "
+												+ items[2][2],
+										header + "Ruleta terminada, has ganado " + accentColor + ganado + textColor
+												+ " por " + accentColor + punt.getMotivo() + textColor + ".",
 //								header + "Ruleta terminada, has ganado " + accentColor + ganado + textColor + ".",
-											header + "Tu dinero actual: " + econ.getBalance(e.getPlayer()), });
-							
-							Bukkit.getScheduler().scheduleSyncDelayedTask(CristichiCasinosCartel.this, new Runnable() {
-								@Override
-								public void run() {
-									cdc.terminarGiro(e.getPlayer());
-								}
-							}, 100);
-							
-							cancelTask();
-						} else
-							cdc.girar(e.getPlayer());
+										header + "Tu dinero actual: " + econ.getBalance(e.getPlayer()), });
+
+								Bukkit.getScheduler().scheduleSyncDelayedTask(CristichiCasinosCartel.this,
+										new Runnable() {
+											@Override
+											public void run() {
+												cdc.terminarGiro(e.getPlayer());
+											}
+										}, 100);
+								finished = true;
+							} else {
+								cdc.girar(e.getPlayer());
+							}
 					}
-				}, 0, 3);
+				}, 0, 6);
 				task = hiloGirarRueda;
 //				}, 0, 100);
 //				Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
@@ -163,9 +166,9 @@ public class CristichiCasinosCartel extends JavaPlugin implements Listener {
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-		System.out.println("---------------");
-		System.out.println(command.getName());
-		System.out.println(alias + ": " + Arrays.toString(args));
+//		System.out.println("---------------");
+//		System.out.println(command.getName());
+//		System.out.println(alias + ": " + Arrays.toString(args));
 		List<String> ret = new ArrayList<>(1);
 		if (args.length <= 1) {
 			ret.add("help");

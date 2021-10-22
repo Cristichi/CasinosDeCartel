@@ -45,7 +45,7 @@ public class CasinoDeCartel {
 								cdc.ruleta = new Ruleta();
 								cdc.cartel = s;
 								e.setLine(2, "¡Prueba Suerte!");
-								e.setLine(3, "Esperando...");
+								e.setLine(3, "Click derecho");
 							} catch (NumberFormatException ex) {
 								e.setLine(0, CasinoDeCartel.HEADER_CARTEL_ERROR);
 								e.setLine(1, "");
@@ -96,8 +96,8 @@ public class CasinoDeCartel {
 		return null;
 	}
 	
-	public void reset(int minGiros, int maxGiros) {
-		ruleta.reset(minGiros, maxGiros);
+	public void reset(int minGiros, int maxGiros, int dif) {
+		ruleta.reset(minGiros, maxGiros, dif);
 	}
 	
 	public boolean isFinished() {
@@ -126,7 +126,7 @@ public class CasinoDeCartel {
 		cartel.setLine(0, HEADER_CARTEL_VISIBLE);
 		cartel.setLine(1, Double.toString(precio));
 		cartel.setLine(2, "¡Prueba Suerte!");
-		cartel.setLine(3, "Esperando...");
+		cartel.setLine(3, "Click derecho");
 		cartel.update();
 	}
 

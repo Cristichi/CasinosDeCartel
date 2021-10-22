@@ -7,7 +7,6 @@ import java.util.Random;
 public class Rollo extends ArrayList<ItemRuleta> {
 	private static final long serialVersionUID = 2465039072523553802L;
 	
-	private Random rng;
 	private int indice = 0;
 
 	private Rollo(ItemRuleta[] array, Random rng) {
@@ -17,7 +16,6 @@ public class Rollo extends ArrayList<ItemRuleta> {
 		}
 		Collections.shuffle(this);
 		indice = rng.nextInt(array.length);
-		this.rng = rng;
 	}
 	
 	public Rollo(Random rng) {
@@ -25,9 +23,7 @@ public class Rollo extends ArrayList<ItemRuleta> {
 	}
 	
 	public ItemRuleta[] siguiente() {
-		if (rng.nextDouble() < 0.7) {
 			indice++;
-		}
 		return new ItemRuleta[] {get(indice+2), get(indice+1), get(indice)};
 	}
 	

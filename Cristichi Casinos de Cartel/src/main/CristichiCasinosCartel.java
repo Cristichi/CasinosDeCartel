@@ -91,46 +91,58 @@ public class CristichiCasinosCartel extends JavaPlugin implements Listener {
 				econ.withdrawPlayer(e.getPlayer(), cdc.getPrecio());
 				e.getPlayer().sendMessage(header + "Has pagado " + accentColor + cdc.getPrecio() + textColor
 						+ " para hacer la tirada. ¡Mucha suerte!");
+
+				cdc.reset(20, 30);
 				int hiloGirarRueda = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 					@Override
 					public void run() {
-						cdc.girar(e.getPlayer());
-//						ItemRuleta[][] items = cdc.getRuleta().actual();
-//						e.getPlayer().sendMessage(new String[] {
-//								"----",
-//								items[0][0] + " " + items[0][1] + " " + items[0][2],
-//								items[1][0] + " " + items[1][1] + " " + items[1][2],
-//								items[2][0] + " " + items[2][1] + " " + items[2][2]
-//						});
+						if (cdc.isFinished()) {
+							cdc.ultimo(e.getPlayer());
+							ItemRuleta[][] items = cdc.getRuleta().actual();
+							Puntuacion punt = cdc.getRuleta().getPuntuacion();
+							double ganado = cdc.getPrecio() * punt.getMult();
+							econ.depositPlayer(e.getPlayer(), ganado);
+							e.getPlayer()
+									.sendMessage(new String[] { header + "Resultado:",
+											".                           " + items[0][0] + " " + items[0][1] + " "
+													+ items[0][2],
+											".                           " + items[1][0] + " " + items[1][1] + " "
+													+ items[1][2],
+											".                           " + items[2][0] + " " + items[2][1] + " "
+													+ items[2][2],
+											header + "Ruleta terminada, has ganado " + accentColor + ganado + textColor
+													+ " por " + accentColor + punt.getMotivo() + textColor + ".",
+//								header + "Ruleta terminada, has ganado " + accentColor + ganado + textColor + ".",
+											header + "Tu dinero actual: " + econ.getBalance(e.getPlayer()), });
+							
+							Bukkit.getScheduler().scheduleSyncDelayedTask(CristichiCasinosCartel.this, new Runnable() {
+								@Override
+								public void run() {
+									cdc.terminarGiro(e.getPlayer());
+								}
+							}, 100);
+							
+							cancelTask();
+						} else
+							cdc.girar(e.getPlayer());
 					}
 				}, 0, 3);
+				task = hiloGirarRueda;
 //				}, 0, 100);
-				Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-					@Override
-					public void run() {
-						Bukkit.getScheduler().cancelTask(hiloGirarRueda);
-						cdc.ultimo(e.getPlayer());
-						ItemRuleta[][] items = cdc.getRuleta().actual();
-						Puntuacion punt = cdc.getRuleta().getPuntuacion();
-						double ganado = cdc.getPrecio() * punt.getMult();
-						econ.depositPlayer(e.getPlayer(), ganado);
-						e.getPlayer().sendMessage(new String[] { header + "Resultado:",
-								".                           " + items[0][0] + " " + items[0][1] + " " + items[0][2],
-								".                           " + items[1][0] + " " + items[1][1] + " " + items[1][2],
-								".                           " + items[2][0] + " " + items[2][1] + " " + items[2][2],
-								header + "Ruleta terminada, has ganado " + accentColor + ganado + textColor + " por "
-										+ accentColor + punt.getMotivo() + textColor + ".",
-//								header + "Ruleta terminada, has ganado " + accentColor + ganado + textColor + ".",
-								header + "Tu dinero actual: " + econ.getBalance(e.getPlayer()), });
-					}
-				}, 100);
+//				Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+//					@Override
+//					public void run() {
+//						Bukkit.getScheduler().cancelTask(hiloGirarRueda);
+//
+//					}
+//				}, 100);
 //				}, 1000);
-				Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-					@Override
-					public void run() {
-						cdc.terminarGiro(e.getPlayer());
-					}
-				}, 400);
+//				Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+//					@Override
+//					public void run() {
+//						cdc.terminarGiro(e.getPlayer());
+//					}
+//				}, 400);
 //				}, 4000);
 			}
 		}
@@ -159,5 +171,11 @@ public class CristichiCasinosCartel extends JavaPlugin implements Listener {
 			ret.add("help");
 		}
 		return ret;
+	}
+
+	private int task;
+
+	private void cancelTask() {
+		Bukkit.getScheduler().cancelTask(task);
 	}
 }

@@ -95,6 +95,14 @@ public class CasinoDeCartel {
 		}
 		return null;
 	}
+	
+	public void reset(int minGiros, int maxGiros) {
+		ruleta.reset(minGiros, maxGiros);
+	}
+	
+	public boolean isFinished() {
+		return ruleta.isFinished();
+	}
 
 	public void girar(Player p) {
 		ItemRuleta[][] items = ruleta.girar();

@@ -105,17 +105,17 @@ public class CristichiCasinosCartel extends JavaPlugin implements Listener {
 								Puntuacion punt = cdc.getRuleta().getPuntuacion();
 								double ganado = cdc.getPrecio() * punt.getMult();
 								econ.depositPlayer(e.getPlayer(), ganado);
-								e.getPlayer().sendMessage(new String[] { header + "Resultado:",
-										".                           " + items[0][0] + " " + items[0][1] + " "
-												+ items[0][2],
-										".                           " + items[1][0] + " " + items[1][1] + " "
-												+ items[1][2],
-										".                           " + items[2][0] + " " + items[2][1] + " "
-												+ items[2][2],
-										header + "Ruleta terminada, has ganado " + accentColor + ganado + textColor
-												+ " por " + accentColor + punt.getMotivo() + textColor + ".",
-//								header + "Ruleta terminada, has ganado " + accentColor + ganado + textColor + ".",
-										header + "Tu dinero actual: " + econ.getBalance(e.getPlayer()), });
+								e.getPlayer()
+										.sendMessage(new String[] { header + "Resultado:",
+												".                           " + items[0][0] + " " + items[0][1] + " "
+														+ items[0][2],
+												".                           " + items[1][0] + " " + items[1][1] + " "
+														+ items[1][2],
+												".                           " + items[2][0] + " " + items[2][1] + " "
+														+ items[2][2],
+												header + "Has ganado " + accentColor + ganado + textColor + " por "
+														+ accentColor + punt.getMotivo() + textColor
+														+ ". Tu dinero actual: " + econ.getBalance(e.getPlayer()), });
 
 								Bukkit.getScheduler().scheduleSyncDelayedTask(CristichiCasinosCartel.this,
 										new Runnable() {

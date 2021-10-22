@@ -49,9 +49,6 @@ public class Ruleta {
 	}
 
 	public boolean isFinished() {
-		System.out.println("giros1 = " + giros1);
-		System.out.println("giros2 = " + giros2);
-		System.out.println("giros3 = " + giros3);
 		return giros1 == giros2 && giros2 == giros3 && giros3 == 0;
 	}
 

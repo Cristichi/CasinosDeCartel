@@ -1,14 +1,18 @@
 package obj;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.plugin.Plugin;
 
 import main.CristichiCasinosCartel;
+import net.milkbowl.vault.economy.Economy;
 import ruleta.ItemRuleta;
+import ruleta.Puntuacion;
 import ruleta.Ruleta;
 
 public class CasinoDeCartel {
@@ -19,6 +23,7 @@ public class CasinoDeCartel {
 	private Sign cartel;
 	private double precio;
 	private Ruleta ruleta;
+	private int hiloGirar;
 
 	public static CasinoDeCartel colocar(SignChangeEvent e, String[] error) {
 		Block bloque = e.getBlock();
@@ -95,11 +100,11 @@ public class CasinoDeCartel {
 		}
 		return null;
 	}
-	
+
 	public void reset(int minGiros, int maxGiros, int dif) {
 		ruleta.reset(minGiros, maxGiros, dif);
 	}
-	
+
 	public boolean isFinished() {
 		return ruleta.isFinished();
 	}
@@ -112,12 +117,15 @@ public class CasinoDeCartel {
 		cartel.setLine(3, p.getDisplayName());
 		cartel.update();
 	}
-	
+
 	public void ultimo(Player p) {
 		ItemRuleta[][] items = ruleta.actual();
-		cartel.setLine(0, ChatColor.GOLD+"-"+ChatColor.RESET+" [" + items[0][0] + "][" + items[0][1] + "][" + items[0][2] + "] "+ChatColor.GOLD+"-");
-		cartel.setLine(1, ChatColor.GOLD+"-"+ChatColor.RESET+" [" + items[1][0] + "][" + items[1][1] + "][" + items[1][2] + "] "+ChatColor.GOLD+"-");
-		cartel.setLine(2, ChatColor.GOLD+"-"+ChatColor.RESET+" [" + items[2][0] + "][" + items[2][1] + "][" + items[2][2] + "] "+ChatColor.GOLD+"-");
+		cartel.setLine(0, ChatColor.GOLD + "-" + ChatColor.RESET + " [" + items[0][0] + "][" + items[0][1] + "]["
+				+ items[0][2] + "] " + ChatColor.GOLD + "-");
+		cartel.setLine(1, ChatColor.GOLD + "-" + ChatColor.RESET + " [" + items[1][0] + "][" + items[1][1] + "]["
+				+ items[1][2] + "] " + ChatColor.GOLD + "-");
+		cartel.setLine(2, ChatColor.GOLD + "-" + ChatColor.RESET + " [" + items[2][0] + "][" + items[2][1] + "]["
+				+ items[2][2] + "] " + ChatColor.GOLD + "-");
 		cartel.setLine(3, p.getDisplayName());
 		cartel.update();
 	}
@@ -147,4 +155,55 @@ public class CasinoDeCartel {
 		return "CasinoDeCartel [precio=" + precio + "]";
 	}
 
+	public void onPlayerTira(Plugin plugin, Player p, Economy econ, String header, String textColor,
+			String accentColor, String errorColor) {
+		if (!econ.hasAccount(p)) {
+			econ.createPlayerAccount(p);
+		}
+		if (econ.getBalance(p) < getPrecio()) {
+			p.sendMessage(header + errorColor + "No puedes permitirte esta tirada. Tienes " + accentColor
+					+ econ.getBalance(p) + errorColor + " y necesitas " + accentColor + getPrecio() + errorColor + ".");
+			return;
+		}
+		econ.withdrawPlayer(p, getPrecio());
+		p.sendMessage(header + "Has pagado " + accentColor + getPrecio() + textColor
+				+ " para hacer la tirada. ¡Mucha suerte!");
+
+		reset(20, 40, 10);
+		Runnable run = new Runnable() {
+			boolean finished = false;
+
+			@Override
+			public void run() {
+				if (!finished)
+					if (isFinished()) {
+//						cancelTask();
+						Bukkit.getScheduler().cancelTask(hiloGirar);
+						ultimo(p);
+						ItemRuleta[][] items = getRuleta().actual();
+						Puntuacion punt = getRuleta().getPuntuacion();
+						double ganado = getPrecio() * punt.getMult();
+						econ.depositPlayer(p, ganado);
+						p.sendMessage(new String[] { header + "Resultado:",
+								".                           " + items[0][0] + " " + items[0][1] + " " + items[0][2],
+								".                           " + items[1][0] + " " + items[1][1] + " " + items[1][2],
+								".                           " + items[2][0] + " " + items[2][1] + " " + items[2][2],
+								header + "Has ganado " + accentColor + ganado + textColor + " por " + accentColor
+										+ punt.getMotivo() + textColor + ". Tu dinero actual: "
+										+ econ.getBalance(p), });
+
+						Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+							@Override
+							public void run() {
+								terminarGiro(p);
+							}
+						}, 100);
+						finished = true;
+					} else {
+						girar(p);
+					}
+			}
+		};
+		hiloGirar = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, run, 0, 6);
+	}
 }

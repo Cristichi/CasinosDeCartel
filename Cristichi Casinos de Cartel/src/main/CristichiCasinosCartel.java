@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
@@ -21,8 +20,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.plugins.Economy_Essentials;
 import obj.CasinoDeCartel;
-import ruleta.ItemRuleta;
-import ruleta.Puntuacion;
 
 public class CristichiCasinosCartel extends JavaPlugin implements Listener {
 	private static final Logger log = Logger.getLogger("Minecraft");
@@ -77,76 +74,8 @@ public class CristichiCasinosCartel extends JavaPlugin implements Listener {
 			Block block = e.getClickedBlock();
 			CasinoDeCartel cdc = CasinoDeCartel.check(block);
 			if (cdc != null) {
-				if (!econ.hasAccount(e.getPlayer())) {
-					econ.createPlayerAccount(e.getPlayer());
-				}
-				if (econ.getBalance(e.getPlayer()) < cdc.getPrecio()) {
-					e.getPlayer()
-							.sendMessage(header + errorColor + "No puedes permitirte esta tirada. Tienes " + accentColor
-									+ econ.getBalance(e.getPlayer()) + errorColor + " y necesitas " + accentColor
-									+ cdc.getPrecio() + errorColor + ".");
-					return;
-				}
-				econ.withdrawPlayer(e.getPlayer(), cdc.getPrecio());
-				e.getPlayer().sendMessage(header + "Has pagado " + accentColor + cdc.getPrecio() + textColor
-						+ " para hacer la tirada. ¡Mucha suerte!");
-
-				cdc.reset(20, 40, 10);
-				int hiloGirarRueda = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-					boolean finished = false;
-
-					@Override
-					public void run() {
-						if (!finished)
-							if (cdc.isFinished()) {
-								cancelTask();
-								cdc.ultimo(e.getPlayer());
-								ItemRuleta[][] items = cdc.getRuleta().actual();
-								Puntuacion punt = cdc.getRuleta().getPuntuacion();
-								double ganado = cdc.getPrecio() * punt.getMult();
-								econ.depositPlayer(e.getPlayer(), ganado);
-								e.getPlayer()
-										.sendMessage(new String[] { header + "Resultado:",
-												".                           " + items[0][0] + " " + items[0][1] + " "
-														+ items[0][2],
-												".                           " + items[1][0] + " " + items[1][1] + " "
-														+ items[1][2],
-												".                           " + items[2][0] + " " + items[2][1] + " "
-														+ items[2][2],
-												header + "Has ganado " + accentColor + ganado + textColor + " por "
-														+ accentColor + punt.getMotivo() + textColor
-														+ ". Tu dinero actual: " + econ.getBalance(e.getPlayer()), });
-
-								Bukkit.getScheduler().scheduleSyncDelayedTask(CristichiCasinosCartel.this,
-										new Runnable() {
-											@Override
-											public void run() {
-												cdc.terminarGiro(e.getPlayer());
-											}
-										}, 100);
-								finished = true;
-							} else {
-								cdc.girar(e.getPlayer());
-							}
-					}
-				}, 0, 6);
-				task = hiloGirarRueda;
-//				}, 0, 100);
-//				Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-//					@Override
-//					public void run() {
-//						Bukkit.getScheduler().cancelTask(hiloGirarRueda);
-//
-//					}
-//				}, 100);
-//				}, 1000);
-//				Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-//					@Override
-//					public void run() {
-//						cdc.terminarGiro(e.getPlayer());
-//					}
-//				}, 400);
-//				}, 4000);
+				cdc.onPlayerTira(this, e.getPlayer(), econ, header, textColor.toString(), accentColor.toString(),
+						errorColor.toString());
 			}
 		}
 	}
@@ -174,11 +103,5 @@ public class CristichiCasinosCartel extends JavaPlugin implements Listener {
 			ret.add("help");
 		}
 		return ret;
-	}
-
-	private int task;
-
-	private void cancelTask() {
-		Bukkit.getScheduler().cancelTask(task);
 	}
 }

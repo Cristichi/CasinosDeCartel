@@ -9,8 +9,8 @@ public class ItemRuleta {
 				new ItemRuleta('A'),
 				new ItemRuleta('B'),
 				new ItemRuleta('C'),
-				new ItemRuleta('X', 1.3),
-				new ItemRuleta('7', 1.7),
+				new ItemRuleta('X', 1.5),
+				new ItemRuleta('7', 2),
 		};
 	}
 	

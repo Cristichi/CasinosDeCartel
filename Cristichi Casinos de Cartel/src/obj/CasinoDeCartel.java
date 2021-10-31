@@ -82,7 +82,7 @@ public class CasinoDeCartel {
 						return null;
 					} else {
 						try {
-							double d = Double.parseDouble(lineas[1]);
+							double d = Math.abs(Double.parseDouble(lineas[1]));
 							cdc.ruleta = new Ruleta();
 							cdc.precio = d;
 							cdc.cartel = s;
@@ -170,6 +170,7 @@ public class CasinoDeCartel {
 				+ " para hacer la tirada. ¡Mucha suerte!");
 
 		reset(20, 40, 10);
+//		reset(5, 10, 0);
 		Runnable run = new Runnable() {
 			boolean finished = false;
 
@@ -198,6 +199,7 @@ public class CasinoDeCartel {
 								terminarGiro(p);
 							}
 						}, 100);
+//						}, 0);
 						finished = true;
 					} else {
 						girar(p);
@@ -205,5 +207,6 @@ public class CasinoDeCartel {
 			}
 		};
 		hiloGirar = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, run, 0, 6);
+//		hiloGirar = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, run, 0, 1);
 	}
 }

@@ -60,22 +60,30 @@ public class CristichiCasinosCartel extends JavaPlugin implements Listener {
 
 	@EventHandler
 	private void onSignChanged(SignChangeEvent e) {
-		CasinoDeCartel cdc = CasinoDeCartel.colocar(e,
-				new String[] { this.header + errorColor + "Para crear un Casino de Cartel debes escribir en el cartel:",
-						textColor + "   [CC]", textColor + "   precio" });
-		if (cdc != null) {
-			e.getPlayer().sendMessage(header + "Has creado un Casino de Cartel.");
+		if (e.getPlayer().hasPermission("casinosdecartel.crear")) {
+			CasinoDeCartel cdc = CasinoDeCartel.colocar(e, new String[] { this.header + errorColor
+					+ "Para crear un Casino de Cartel debes escribir en el cartel algo como lo siguiente (si quieres que cueste 100 por ejemplo):",
+					textColor + "   [CC]", textColor + "   100" });
+			if (cdc != null) {
+				e.getPlayer().sendMessage(header + "Has creado un Casino de Cartel.");
+			}
+		} else {
+			e.getPlayer().sendMessage(header + errorColor + "No tienes permiso para crear carteles.");
 		}
 	}
 
 	@EventHandler
 	private void onSignClicked(PlayerInteractEvent e) {
 		if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-			Block block = e.getClickedBlock();
-			CasinoDeCartel cdc = CasinoDeCartel.check(block);
-			if (cdc != null) {
-				cdc.onPlayerTira(this, e.getPlayer(), econ, header, textColor.toString(), accentColor.toString(),
-						errorColor.toString());
+			if (e.getPlayer().hasPermission("casinosdecartel.usar")) {
+				Block block = e.getClickedBlock();
+				CasinoDeCartel cdc = CasinoDeCartel.check(block);
+				if (cdc != null) {
+					cdc.onPlayerTira(this, e.getPlayer(), econ, header, textColor.toString(), accentColor.toString(),
+							errorColor.toString());
+				}
+			} else {
+				e.getPlayer().sendMessage(header + errorColor + "No tienes permiso para crear carteles.");
 			}
 		}
 	}

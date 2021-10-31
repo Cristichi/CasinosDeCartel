@@ -8,3 +8,23 @@ commands:
     description: Controla el plugin.
     aliases: [cc, ccc]
     usage: /cc help
+
+permissions:
+  casinosdecartel.*:
+    description: Permite acceso a todo.
+    children:
+      casinosdecartel.admin: true
+      casinosdecartel.crear: true
+      casinosdecartel.usar: true
+  casinosdecartel.admin:
+    description: Permite utilizar comandos administrativos.
+    default: op
+    children:
+      casinosdecartel.crear: true
+      casinosdecartel.usar: true
+  casinosdecartel.crear:
+    description: Permite crear casinos de cartel. El precio puede ser cualquiera deseado.
+    default: false
+  casinosdecartel.usar:
+    description: Permite usar casinos de cartel al precio que esté especificado.
+    default: true

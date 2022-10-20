@@ -1,12 +1,12 @@
 name: CristichiCasinosDeCartel
 main: main.CristichiCasinosCartel
-version: 0.115
+version: 1.15
 api-version: 1.13
 depend: [Vault, Essentials]
 commands:
   criscasinocartel:
     description: Controla el plugin.
-    aliases: [cc, ccc]
+    aliases: [cc, ccc, cdc]
     usage: /cc help
 
 permissions:
